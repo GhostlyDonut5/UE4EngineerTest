@@ -1,9 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
+#include "AIREngineerTestGameModeBase.h"
 #include "Robot.h"
 
 
-// Sets default values
+// --------------------Sets default values--------------------
 ARobot::ARobot()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -17,62 +19,46 @@ ARobot::ARobot()
 }
 
 
-// Called when the game starts or when spawned
+//--------------------Called when the game starts or when spawned--------------------
 void ARobot::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FString test_list[10];
-
-	test_list[0] = "move";
-	test_list[1] = "left";
-	test_list[2] = "right";
-	test_list[3] = "left";
-	test_list[4] = "move";
-
-	Start_Queue(test_list);
+	Start_Queue();
 }
 
 
-
-// Called every frame
-void ARobot::Tick(float DeltaTime)
+//--------------------Queue Functions--------------------
+void ARobot::Start_Queue()
 {
-	Super::Tick(DeltaTime);
-}
+	//Get reference to the current instance of the Robot instructions
+	AAIREngineerTestGameModeBase* GameMode = Cast<AAIREngineerTestGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
-//Queue Functions
+	Instruction = GameMode->RobotInstruction;
 
-void ARobot::Start_Queue(FString commands[])
-{
-	for (int i = 0; i <= commands->Len(); ++i)
-	{
-		instructions.Enqueue(commands[i]);
-	}
-
-	Execute_Queue();
+	Execute_Instruction(&Instruction->instructions);
 
 	GetWorld()->GetTimerManager().SetTimer(Queue_Handle, [this]()
 	{
 		if (!GetWorldTimerManager().IsTimerActive(Handle))
 		{
-			Execute_Queue();
+			Execute_Instruction(&Instruction->instructions);
+
 		}
 
 	}, 1.0f, true);
 }
 
 
-void ARobot::Execute_Queue()
+void ARobot::Execute_Instruction(TQueue<FString>* queue)
 {
 	//Temporary variable to store current command.
 	FString temp;
 
-
-	if (!instructions.IsEmpty())
+	if (!queue->IsEmpty())
 	{
 		//Get, then check the next command in the queue. Then execute.
-		if (instructions.Dequeue(temp))
+		if (queue->Dequeue(temp))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Currently dequeuing: %s"), *temp);
 
@@ -119,35 +105,36 @@ void ARobot::Rotate(FString direction)
 }
 
 
-//Actual functions
+//Actual Logic
 void ARobot::Move()
 {
-	//For blueprint set variable
-	//float dist = Instruction->set_distance;
-
 	//Raycast to check if about to collide with something.
 	FHitResult* HitResult = new FHitResult();
-	FVector Start = GetActorLocation();
+	FVector Ray_Start = GetActorLocation();
 	FVector ForwardVector = GetActorForwardVector();
-	FVector End = ((ForwardVector * 5000.0f) + Start);
+	FVector Ray_End = ((ForwardVector * 5000.0f) + Ray_Start);
 
 	//Set Trace Params, can modify this in child classes.
 	TraceParams = new FCollisionQueryParams();
 	TraceParams->AddIgnoredActor(this);
 
-	if (GetWorld()->LineTraceSingleByChannel(*HitResult, Start, End, ECC_Visibility, *TraceParams))
+	if (GetWorld()->LineTraceSingleByChannel(*HitResult, Ray_Start, Ray_End, ECC_Visibility, *TraceParams))
 	{
-		DrawDebugLine(GetWorld(), Start, End, FColor(255, 0, 0), true);
+		DrawDebugLine(GetWorld(), Ray_Start, Ray_End, FColor(255, 0, 0), true);
 
 		if (HitResult->Distance < (GetActorScale().X * 50) + 100)
 		{
 			GetWorldTimerManager().ClearTimer(Handle);
 		}
+		else
+		{
+			//Move actor if nothing in the way.
+			SetActorLocation(FMath::Lerp(GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * Instruction->travel_distance), Instruction->speed * 0.001f));
+		}
 	}
 
-	SetActorLocation(FMath::Lerp(GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * travel_distance), speed));
-
-	if (FVector::Dist(GetActorLocation(), prev_loc + (prev_forward * travel_distance)) <= 0.1f)
+	//Check distance between destination and current location.
+	if (FVector::Dist(GetActorLocation(), prev_loc + (prev_forward * Instruction->travel_distance)) <= 0.1f)
 	{
 		GetWorldTimerManager().ClearTimer(Handle);
 	}
@@ -155,24 +142,82 @@ void ARobot::Move()
 
 void ARobot::Turn_Left()
 {
-	FQuat QuatRotation = FRotator(0.0f, GetActorRotation().Pitch - 90.0f, 0.0f).Quaternion();
 
-	SetActorRotation(FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), 0.05f));
+	//Need to find some way to lerp this for smoother turning. Currently Gimbal lock is happening.
+		//SetActorRotation(FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), Instruction->rotation_speed * 0.01f));
+		//FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), Instruction->rotation_speed * 0.01f);
+	FQuat QuatRotation;
 
-	if(GetActorRotation().Yaw <= prev_rot - 89.0f)
+	QuatRotation = FRotator(0.0f, GetActorRotation().Pitch - 90.0f, 0.0f).Quaternion();
+
+	AddActorLocalRotation(QuatRotation);
+
+	if((GetActorRotation().Yaw < 0.0f && GetActorRotation().Yaw <= prev_rot - 90.0f) ||
+		(GetActorRotation().Yaw > 0.0f && prev_rot - 90.0f <= GetActorRotation().Yaw))
 	{
 		GetWorldTimerManager().ClearTimer(Handle);
-	}	
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(Handle);
+	}
 }
 
 void ARobot::Turn_Right()
 {
+	//Need to find some way to lerp this for smoother turning. Currently Gimbal lock is happening.
+		//SetActorRotation(FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), Instruction->rotation_speed * 0.01f));
+		//FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), Instruction->rotation_speed * 0.01f);
 	FQuat QuatRotation = FRotator(0.0f, GetActorRotation().Pitch + 90.0f, 0.0f).Quaternion();
 
-	SetActorRotation(FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), 0.05f));
+	AddActorLocalRotation(QuatRotation);
 
-	if (GetActorRotation().Yaw >= prev_rot + 90.0f)
+	if ((GetActorRotation().Yaw > 0.0f && GetActorRotation().Yaw >= prev_rot + 90.0f) ||
+		(GetActorRotation().Yaw < 0.0f && prev_rot + 90.0f >= GetActorRotation().Yaw))
 	{
 		GetWorldTimerManager().ClearTimer(Handle);
 	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(Handle);
+	}
+}
+
+//Look Math for Looking at Sphere
+FQuat ARobot::Look(FVector dest_point, FVector curr_loc)
+{
+	FVector v_to_normalize = dest_point - curr_loc;
+	FVector cross_prod;
+	float dot;
+
+	if (v_to_normalize.Normalize())
+	{
+		cross_prod.X = ((curr_loc.ForwardVector.Y * v_to_normalize.Z) + (curr_loc.ForwardVector.Z * v_to_normalize.Y));
+		cross_prod.Y = -((curr_loc.ForwardVector.X * v_to_normalize.Z) + (curr_loc.ForwardVector.Z * v_to_normalize.X));
+		cross_prod.Z = ((curr_loc.ForwardVector.X * v_to_normalize.Y) + (curr_loc.ForwardVector.Y * v_to_normalize.X));
+
+		dot = (curr_loc.ForwardVector.X * v_to_normalize.X) +
+			(curr_loc.ForwardVector.Y * v_to_normalize.Y) +
+			(curr_loc.ForwardVector.Z * v_to_normalize.Z);
+	}
+
+	FQuat q;
+	q.X = cross_prod.X;
+	q.Y = cross_prod.Y;
+	q.Z = cross_prod.Z;
+	q.W = dot + 1;
+	q.Normalize();
+	return q;
+}
+
+
+//Function to look at grabber's next target
+void ARobot::Look_At_Target(FVector target)
+{
+	//More rotation math.
+	FRotator curr_rot = GetActorRotation().Quaternion().Rotator();
+	curr_rot.Quaternion() = Look(curr_rot.Vector(), target);
+	FVector look_direction = target - GetActorLocation();
+
+	SetActorRotation(FMath::Lerp(GetActorRotation().Quaternion().Rotator(), Look(curr_rot.Quaternion().Vector(), look_direction).Rotator(), Instruction->rotation_speed * 0.01f));
 }

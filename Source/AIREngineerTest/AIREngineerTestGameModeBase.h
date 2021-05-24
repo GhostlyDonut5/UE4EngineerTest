@@ -13,5 +13,10 @@ UCLASS()
 class AIRENGINEERTEST_API AAIREngineerTestGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	AAIREngineerTestGameModeBase();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Instructions")
+		class URobotInstruction *RobotInstruction;
 };

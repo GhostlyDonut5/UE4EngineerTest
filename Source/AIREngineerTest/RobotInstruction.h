@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Robot.h"
 #include "RobotInstruction.generated.h"
 
 /*  */
@@ -13,27 +12,39 @@ class AIRENGINEERTEST_API URobotInstruction : public UObject
 	GENERATED_BODY()
 
 
-	FQuat Look(FVector dest_point, FVector curr_loc);
-
-	FRotator Look_At_Target(FRotator rotation, FVector position, FVector target, float rot_speed);
-
+	TArray<FString> instruction_list;
 
 public:
-	URobotInstruction();	
+	URobotInstruction();
 
-	ARobot* Robot;
+	//Modifiable variables.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot Movement")
+	float speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot Movement")
+	float travel_distance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot Movement")
+		float rotation_speed;
+
+
+
+	//Callable_Functions
+
+	UFUNCTION(BlueprintCallable)
+		bool Populate_Instructions();
 
 	UFUNCTION(BlueprintCallable)
 		bool ExecuteInstruction();
 
 	UFUNCTION(BlueprintCallable)
-		void Move(float distance, float speed);
+		void Move();
 	
 	UFUNCTION(BlueprintCallable)
-		FRotator Rotate_Left(FRotator rotation, float rot_speed);
+		void Rotate_Left();
 
 	UFUNCTION(BlueprintCallable)
-		FRotator Rotate_Right(FRotator rotation, float rot_speed);
+		void Rotate_Right();
 
-	float set_distance;
+	TQueue<FString> instructions;
 };

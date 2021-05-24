@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "RobotInstruction.h"
 #include "Robot.generated.h"
 
 UCLASS()
@@ -20,25 +21,19 @@ class AIRENGINEERTEST_API ARobot : public APawn
 	FVector prev_forward;
 	float prev_rot;
 
+	FQuat Look(FVector dest_point, FVector curr_loc);
+
 public:
 	// Sets default values for this pawn's properties
 	ARobot();
 
-	//URobotInstruction* Instruction;
+	URobotInstruction* Instruction;
+
 	TQueue<FString> instructions;
 
-	//Modifiable values
-	float travel_distance;
-	float speed;
-	float rot_speed;
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	//Queue Functions
-	void Start_Queue(FString commands[]);
-	void Execute_Queue();
-	void Add_To_Queue();
+	void Start_Queue();
+	void Execute_Instruction(TQueue<FString>* queue);
 
 	//Timer Functions
 	void Move_Timer();
@@ -56,15 +51,9 @@ protected:
 	//Raycast Modifiable values
 	FCollisionQueryParams* TraceParams;
 
-
-
 	//Execution Functions
-	UFUNCTION()
 	void Move();
-
-	UFUNCTION()
 	void Turn_Left();
-
-	UFUNCTION()
 	void Turn_Right();
+	void Look_At_Target(FVector target);
 };
