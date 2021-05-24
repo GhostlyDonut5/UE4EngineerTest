@@ -53,25 +53,22 @@ void ARobot::Start_Queue()
 void ARobot::Execute_Instruction(TQueue<FString>* queue)
 {
 	//Temporary variable to store current command.
-	FString temp;
+	next_instruction;
 
 	if (!queue->IsEmpty())
 	{
 		//Get, then check the next command in the queue. Then execute.
-		if (queue->Dequeue(temp))
+		if (queue->Dequeue(next_instruction))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Currently dequeuing: %s"), *temp);
-
-			if (temp == "move")
+			if (next_instruction == "move")
 			{
 				Move_Timer();
 			}
 			
-			if (temp == "left" || temp == "right")
+			if (next_instruction == "left" || next_instruction == "right")
 			{
-				Rotate(temp);
+				Rotate(next_instruction);
 			}
-			
 		}
 	}
 

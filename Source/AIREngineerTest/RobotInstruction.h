@@ -45,6 +45,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void Rotate_Right();
+	UFUNCTION(BlueprintCallable)
+		void Drop_A_Sphere();
+	UFUNCTION(BlueprintCallable)
+		void Document_A_Sphere();
 
 	TQueue<FString> instructions;
 };

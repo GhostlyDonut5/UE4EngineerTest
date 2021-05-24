@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Engine/StaticMeshActor.h"
 #include "RobotInstruction.h"
 #include "Robot.generated.h"
 
@@ -28,12 +29,11 @@ public:
 	ARobot();
 
 	URobotInstruction* Instruction;
-
 	TQueue<FString> instructions;
 
 	//Queue Functions
 	void Start_Queue();
-	void Execute_Instruction(TQueue<FString>* queue);
+	virtual void Execute_Instruction(TQueue<FString>* queue);
 
 	//Timer Functions
 	void Move_Timer();
@@ -50,6 +50,8 @@ protected:
 
 	//Raycast Modifiable values
 	FCollisionQueryParams* TraceParams;
+
+	FString next_instruction;
 
 	//Execution Functions
 	void Move();

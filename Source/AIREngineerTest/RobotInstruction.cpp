@@ -52,6 +52,14 @@ bool URobotInstruction::ExecuteInstruction()
 		{
 			Rotate_Left();
 		}
+		if (instruction_list[i] == "drop")
+		{
+			Drop_A_Sphere();
+		}
+		if (instruction_list[i] == "grab")
+		{
+			Document_A_Sphere();
+		}
 	}
 
 	return true;
@@ -71,4 +79,14 @@ void URobotInstruction::Rotate_Left()
 void URobotInstruction::Rotate_Right()
 {
 	instructions.Enqueue("right");
+}
+
+void URobotInstruction::Drop_A_Sphere()
+{
+	instructions.Enqueue("drop");
+}
+
+void URobotInstruction::Document_A_Sphere()
+{
+	instructions.Enqueue("grab");
 }
