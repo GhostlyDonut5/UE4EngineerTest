@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Kismet/GameplayStatics.h"
+#include "AIREngineerTestGameModeBase.h"
 #include "Engine/StaticMeshActor.h"
 #include "RobotInstruction.h"
 #include "Robot.generated.h"
@@ -14,7 +16,6 @@ class AIRENGINEERTEST_API ARobot : public APawn
 	GENERATED_BODY()
 
 	//Timer Handles
-	FTimerHandle Handle;
 	FTimerHandle Queue_Handle;
 
 	//Temporary variables.
@@ -22,17 +23,16 @@ class AIRENGINEERTEST_API ARobot : public APawn
 	FVector prev_forward;
 	float prev_rot;
 
-	FQuat Look(FVector dest_point, FVector curr_loc);
 
 public:
 	// Sets default values for this pawn's properties
 	ARobot();
 
-	URobotInstruction* Instruction;
-	TQueue<FString> instructions;
+	URobotInstruction* Robot_Instruction;
+	TQueue<FString>* instructions;
 
 	//Queue Functions
-	void Start_Queue();
+	virtual void Start_Queue();
 	virtual void Execute_Instruction(TQueue<FString>* queue);
 
 	//Timer Functions
@@ -53,9 +53,10 @@ protected:
 
 	FString next_instruction;
 
+	FTimerHandle Handle;
+
 	//Execution Functions
 	void Move();
 	void Turn_Left();
 	void Turn_Right();
-	void Look_At_Target(FVector target);
 };

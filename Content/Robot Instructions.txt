@@ -1,11 +1,11 @@
-left
 move
-drop
-left
+right
 move
-drop
-left
+grab
 move
 right
 left
-right
+move
+grab
+grab
+grab

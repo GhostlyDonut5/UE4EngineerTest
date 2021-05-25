@@ -26,10 +26,7 @@ class AIRENGINEERTEST_API ADropper : public ARobot
 		//Getting Next Sphere in Pool
 		AStaticMeshActor* Get_Sphere();
 
-public:
-
-	AActor* curr_compared_object_actor;
-	
+public:	
 	//Storing Spheres in Linked List.
 	TLinkedList<AStaticMeshActor*> Trail_List;
 	
@@ -37,10 +34,8 @@ public:
 	AStaticMeshActor* temp_mesh;
 	FVector equi_distance_vector;
 	FActorSpawnParameters SpawnInfo;
-	FTimerHandle Dropper_Handle;
 	bool all_actors_exposed;
 	int init_amount;
-	int i;
 
 	TLinkedList<AStaticMeshActor*>* current;
 	TLinkedList<AStaticMeshActor*>* next;

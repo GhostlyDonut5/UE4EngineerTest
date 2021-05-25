@@ -9,7 +9,7 @@ URobotInstruction::URobotInstruction()
 	travel_distance = 3000.0f;
 }
 
-bool URobotInstruction::Populate_Instructions()
+void URobotInstruction::Populate_Instructions(FString filename)
 {
 	//Get from a text file to execute specific instructions, populate a set of instructions here.
 	FString FileName = "Robot Instructions.txt";
@@ -23,12 +23,6 @@ bool URobotInstruction::Populate_Instructions()
 		FFileHelper::LoadFileToString(result, *myFile);
 		result.ParseIntoArrayLines(instruction_list, true);
 	}
-	else
-	{
-		return false;
-	}
-
-	return true;
 }
 
 bool URobotInstruction::ExecuteInstruction()

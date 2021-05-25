@@ -13,6 +13,18 @@ void ADropper::BeginPlay()
 {
 	Super::BeginPlay();
 
+	instructions->Enqueue("drop");
+	instructions->Enqueue("move");
+	instructions->Enqueue("left");
+	instructions->Enqueue("drop");
+	instructions->Enqueue("move");
+	instructions->Enqueue("drop");
+	instructions->Enqueue("right");
+	instructions->Enqueue("move");
+	instructions->Enqueue("drop");
+	instructions->Enqueue("right");
+	instructions->Enqueue("move");
+	instructions->Enqueue("drop");
 	Pool_Objects();
 }
 
@@ -20,7 +32,7 @@ void ADropper::Execute_Instruction(TQueue<FString>* queue)
 {
 	Super::Execute_Instruction(queue);
 
-	UE_LOG(LogTemp, Warning, TEXT("Next Instruction: %s"), *next_instruction);
+	UE_LOG(LogTemp, Warning, TEXT("Next Dropper Instruction: %s"), *next_instruction);
 
 	if (next_instruction == "drop")
 	{
@@ -28,19 +40,17 @@ void ADropper::Execute_Instruction(TQueue<FString>* queue)
 	}
 }
 
-
+//--------------------Object Pooling for Spheres, storing in Linked List--------------------
 void ADropper::Pool_Objects()
 {
 	init_amount = 10;
 	int it = 0;
-
-	curr_compared_object_actor = this;
-	equi_distance_vector = Cube->GetForwardVector();
 	
 	//With Linked List
 	temp_mesh = GetWorld()->SpawnActor<AStaticMeshActor>(FVector(0.0f,0.0f,0.0f), GetActorRotation(), SpawnInfo);
 	temp_mesh->GetStaticMeshComponent()->SetMobility(EComponentMobility::Movable);
 	temp_mesh->GetStaticMeshComponent()->SetStaticMesh(Sphere_Mesh);
+	temp_mesh->Tags.Add("Grabber_Sphere");
 	temp_mesh->SetActorHiddenInGame(true);
 
 	Trail_List = TLinkedList<AStaticMeshActor*>(temp_mesh);
@@ -52,6 +62,7 @@ void ADropper::Pool_Objects()
 		temp_mesh = GetWorld()->SpawnActor<AStaticMeshActor>(FVector(0.0f, 0.0f, 0.0f), GetActorRotation(), SpawnInfo);
 		temp_mesh->GetStaticMeshComponent()->SetMobility(EComponentMobility::Movable);
 		temp_mesh->GetStaticMeshComponent()->SetStaticMesh(Sphere_Mesh);
+		temp_mesh->Tags.Add("Grabber_Sphere");
 		temp_mesh->SetActorHiddenInGame(true);
 
 		TLinkedList<AStaticMeshActor*>* const node_next = new TLinkedList<AStaticMeshActor*>(temp_mesh);
@@ -62,6 +73,7 @@ void ADropper::Pool_Objects()
 	}
 }
 
+//--------------------Getting Next Sphere in Linked List--------------------
 AStaticMeshActor* ADropper::Get_Sphere()
 {
 	current = &Trail_List;
@@ -93,6 +105,7 @@ AStaticMeshActor* ADropper::Get_Sphere()
 	return NULL;
 }
 
+//--------------------Dropping the Sphere--------------------
 void ADropper::Drop_Sphere()
 {
 	//Linked List
@@ -104,8 +117,9 @@ void ADropper::Drop_Sphere()
 	if (temp_mesh != NULL)
 	{
 		temp_mesh->GetStaticMeshComponent()->SetMobility(EComponentMobility::Movable);
-		temp_mesh->SetActorLocation(curr_compared_object_actor->GetRootComponent()->GetRelativeLocation() + equi_distance_vector);
+		temp_mesh->SetActorLocation(GetActorLocation() + equi_distance_vector);
 		temp_mesh->SetActorRotation(GetActorRotation());
+		temp_mesh->SetActorLocation(FVector(temp_mesh->GetActorLocation().X, temp_mesh->GetActorLocation().Y, 300.0f));
 		temp_mesh->SetHidden(false);
 	}
 }
