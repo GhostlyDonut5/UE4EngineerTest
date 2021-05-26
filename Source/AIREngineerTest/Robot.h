@@ -15,6 +15,9 @@ class AIRENGINEERTEST_API ARobot : public APawn
 {
 	GENERATED_BODY()
 
+		//timer to track how long we've been moving.
+		float timer;
+
 	//Timer Handles
 	FTimerHandle Queue_Handle;
 

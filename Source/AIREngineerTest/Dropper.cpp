@@ -13,26 +13,14 @@ void ADropper::BeginPlay()
 {
 	Super::BeginPlay();
 
-	instructions->Enqueue("drop");
-	instructions->Enqueue("move");
-	instructions->Enqueue("left");
-	instructions->Enqueue("drop");
-	instructions->Enqueue("move");
-	instructions->Enqueue("drop");
-	instructions->Enqueue("right");
-	instructions->Enqueue("move");
-	instructions->Enqueue("drop");
-	instructions->Enqueue("right");
-	instructions->Enqueue("move");
-	instructions->Enqueue("drop");
+	instructions = &Robot_Instruction->dropper_instructions;
+
 	Pool_Objects();
 }
 
 void ADropper::Execute_Instruction(TQueue<FString>* queue)
 {
 	Super::Execute_Instruction(queue);
-
-	UE_LOG(LogTemp, Warning, TEXT("Next Dropper Instruction: %s"), *next_instruction);
 
 	if (next_instruction == "drop")
 	{

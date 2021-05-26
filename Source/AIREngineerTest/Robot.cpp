@@ -101,6 +101,14 @@ void ARobot::Rotate(FString direction)
 //--------------------Actual Logic--------------------
 void ARobot::Move()
 {
+	timer++;
+
+	if (timer >= 200.0f)
+	{
+		timer = 0;
+		GetWorldTimerManager().ClearTimer(Handle);
+	}
+
 	//Raycast to check if about to collide with something.
 	FHitResult* HitResult = new FHitResult();
 	FVector Ray_Start = GetActorLocation();
@@ -117,6 +125,7 @@ void ARobot::Move()
 
 		if (HitResult->Distance < (GetActorScale().X * 50) + 100)
 		{
+			timer = 0;
 			GetWorldTimerManager().ClearTimer(Handle);
 		}
 		else
@@ -127,8 +136,9 @@ void ARobot::Move()
 	}
 
 	//Check distance between destination and current location.
-	if (FVector::Dist(GetActorLocation(), prev_loc + (prev_forward * Robot_Instruction->travel_distance)) <= 0.1f)
+	if (FVector::Dist(GetActorLocation(), prev_loc + (prev_forward * Robot_Instruction->travel_distance)) <= 1.0f)
 	{
+		timer = 0;
 		GetWorldTimerManager().ClearTimer(Handle);
 	}
 }

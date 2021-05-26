@@ -18,14 +18,12 @@ void AGrabber::BeginPlay()
 	Super::BeginPlay();
 	Camera->SetRelativeLocation(FVector(0.0f, 0.0f, 40.0f));
 
-	instructions = &Robot_Instruction->instructions;
+	instructions = &Robot_Instruction->grabber_instructions;
 }
 
 void AGrabber::Execute_Instruction(TQueue<FString>* queue)
 {
 	Super::Execute_Instruction(queue);
-
-	UE_LOG(LogTemp, Warning, TEXT("Next Grabber Instruction: %s"), *next_instruction);
 
 	if (next_instruction == "grab")
 	{
@@ -72,6 +70,11 @@ void AGrabber::Find_Closest_Sphere()
 //--------------------Grabbing Sphere Timer--------------------
 void AGrabber::Grab_Sphere()
 {
+	if (Closest_Sphere->IsHidden())
+	{
+		GetWorldTimerManager().ClearTimer(Grabber_Handle);
+	}
+
 	if (FVector::Dist(GetActorLocation(), Closest_Sphere->GetActorLocation()) < (GetActorScale().X * 50) + 200)
 	{
 		spheres_documented++;
