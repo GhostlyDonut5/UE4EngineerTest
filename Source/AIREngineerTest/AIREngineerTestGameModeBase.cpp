@@ -5,5 +5,6 @@
 
 AAIREngineerTestGameModeBase::AAIREngineerTestGameModeBase()
 {
+	//Storing instance
 	RobotInstruction = NewObject<URobotInstruction>(this, URobotInstruction::StaticClass(), FName("RobotInstruction"));
 }

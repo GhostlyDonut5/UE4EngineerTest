@@ -17,6 +17,7 @@ class AIRENGINEERTEST_API AAIREngineerTestGameModeBase : public AGameModeBase
 public:
 	AAIREngineerTestGameModeBase();
 
+	//Class to store instance of RobotInstruction class in Constructor.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Instructions")
 		class URobotInstruction *RobotInstruction;
 };

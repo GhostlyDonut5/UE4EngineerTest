@@ -101,8 +101,8 @@ void ARobot::Rotate(FString direction)
 //--------------------Actual Logic--------------------
 void ARobot::Move()
 {
+	//Keep track of how long we've been moving
 	timer++;
-
 	if (timer >= 200.0f)
 	{
 		timer = 0;
@@ -115,14 +115,12 @@ void ARobot::Move()
 	FVector ForwardVector = GetActorForwardVector();
 	FVector Ray_End = ((ForwardVector * 5000.0f) + Ray_Start);
 
-	//Set Trace Params, can modify this in child classes.
 	TraceParams = new FCollisionQueryParams();
 	TraceParams->AddIgnoredActor(this);
 
 	if (GetWorld()->LineTraceSingleByChannel(*HitResult, Ray_Start, Ray_End, ECC_Visibility, *TraceParams))
 	{
-		//DrawDebugLine(GetWorld(), Ray_Start, Ray_End, FColor(255, 0, 0), true);
-
+		//Checks to see if close to a wall, and stops.
 		if (HitResult->Distance < (GetActorScale().X * 50) + 100)
 		{
 			timer = 0;
@@ -143,9 +141,10 @@ void ARobot::Move()
 	}
 }
 
+
+//--------------------Rotation Functions, need to be fixed--------------------
 void ARobot::Turn_Left()
 {
-
 	//Need to find some way to lerp this for smoother turning. Currently Gimbal lock is happening.
 		//SetActorRotation(FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), Robot_Instruction->rotation_speed * 0.01f));
 		//FMath::Lerp(GetActorRotation(), QuatRotation.Rotator(), Robot_Instruction->rotation_speed * 0.01f);

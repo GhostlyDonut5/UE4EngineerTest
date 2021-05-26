@@ -20,7 +20,7 @@ class AIRENGINEERTEST_API ADropper : public ARobot
 		//Initializing Objects At Start
 		void Pool_Objects();
 
-		//Dropping Sphere Functionality
+		//Drop Sphere Functionality
 		void Drop_Sphere();
 
 		//Getting Next Sphere in Pool
@@ -35,15 +35,18 @@ public:
 	FVector equi_distance_vector;
 	FActorSpawnParameters SpawnInfo;
 	bool all_actors_exposed;
+
+	//Initial amount of spheres to pool from. May add this to Robot Instruction interface class.
 	int init_amount;
 
+	//Storing current and next nodes of Linked_List
 	TLinkedList<AStaticMeshActor*>* current;
 	TLinkedList<AStaticMeshActor*>* next;
-
 
 protected:
 
 	virtual void BeginPlay() override;
 
+	//Overriding for Drop Sphere functionality
 	virtual void Execute_Instruction(TQueue<FString>* queue) override;
 };

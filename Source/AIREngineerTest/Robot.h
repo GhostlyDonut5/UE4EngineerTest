@@ -15,8 +15,8 @@ class AIRENGINEERTEST_API ARobot : public APawn
 {
 	GENERATED_BODY()
 
-		//timer to track how long we've been moving.
-		float timer;
+	//timer to track how long we've been moving.
+	float timer;
 
 	//Timer Handles
 	FTimerHandle Queue_Handle;
@@ -31,6 +31,7 @@ public:
 	// Sets default values for this pawn's properties
 	ARobot();
 
+	//Used to store an instance of the queue as well as the Robot_Instruction UObject
 	URobotInstruction* Robot_Instruction;
 	TQueue<FString>* instructions;
 
@@ -46,7 +47,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//Static Mesh Components
+	//Static Mesh Components for Actor
 	UStaticMeshComponent* Cube;
 	UStaticMesh* Cube_Mesh;
 	UStaticMesh* Sphere_Mesh;
@@ -54,11 +55,13 @@ protected:
 	//Raycast Modifiable values
 	FCollisionQueryParams* TraceParams;
 
+	//Stores the next instruction in the Queue
 	FString next_instruction;
 
+	//The Handle for the timers used for movement.
 	FTimerHandle Handle;
 
-	//Execution Functions
+	//Actual Logic Functions
 	void Move();
 	void Turn_Left();
 	void Turn_Right();

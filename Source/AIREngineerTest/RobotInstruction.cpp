@@ -9,11 +9,6 @@ URobotInstruction::URobotInstruction()
 	travel_distance = 3000.0f;
 }
 
-bool URobotInstruction::ExecuteInstructions()
-{
-	return true;
-}
-
 //--------------------Get Instructions from a text file in the content directory to execute specific instructions--------------------
 bool URobotInstruction::Get_Instructions_From_Text_File(FString FileName, FString Desired_Robot)
 {
@@ -94,32 +89,4 @@ void URobotInstruction::Queue_Instructions(TQueue<FString>* instructions, TArray
 			instructions->Enqueue("grab");
 		}
 	}
-}
-
-
-
-//--------------------Deprecated Functions that Were Supposed to Add to Queue If Blueprint User Wanted to Utilize Them--------------------
-void URobotInstruction::Move()
-{
-	//instructions.Enqueue("move");
-}
-
-void URobotInstruction::Rotate_Left()
-{
-	//instructions.Enqueue("left");
-}
-
-void URobotInstruction::Rotate_Right()
-{
-	//instructions.Enqueue("right");
-}
-
-void URobotInstruction::Drop_A_Sphere()
-{
-	//instructions.Enqueue("drop");
-}
-
-void URobotInstruction::Document_A_Sphere()
-{
-	//instructions.Enqueue("grab");
 }

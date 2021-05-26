@@ -11,7 +11,7 @@ class AIRENGINEERTEST_API URobotInstruction : public UObject
 {
 	GENERATED_BODY()
 
-	TArray<FString> text_instruction_list;
+	void Queue_Instructions(TQueue<FString>* instructions, TArray<FString> stored_list);
 
 public:
 	URobotInstruction();
@@ -19,7 +19,7 @@ public:
 	TQueue<FString> grabber_instructions;
 	TQueue<FString> dropper_instructions;
 
-	//Modifiable variables.
+	//Modifiable blueprint variables.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Robot Movement")
 		float speed;
 
@@ -35,33 +35,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Instructions")
 		TArray<FString> grabber_list;
 
-	void Queue_Instructions(TQueue<FString>* instructions, TArray<FString> stored_list);
 
-	//Callable_Functions
+	//Callable Blueprint Functions
 	UFUNCTION(BlueprintCallable)
 		bool Get_Instructions_From_Text_File(FString FileName, FString Desired_Robot);
 
 	UFUNCTION(BlueprintCallable)
 		bool Get_Instructions_From_Array(TArray<FString> stored_list);
-
-	UFUNCTION(BlueprintCallable)
-		bool ExecuteInstructions();
-
-	UFUNCTION(BlueprintCallable)
-		void Move();
-	
-	UFUNCTION(BlueprintCallable)
-		void Rotate_Left();
-
-	UFUNCTION(BlueprintCallable)
-		void Rotate_Right();
-
-	UFUNCTION(BlueprintCallable)
-		void Drop_A_Sphere();
-
-	UFUNCTION(BlueprintCallable)
-		void Document_A_Sphere();
-
-
-	TQueue<FString> text_instructions;
 };

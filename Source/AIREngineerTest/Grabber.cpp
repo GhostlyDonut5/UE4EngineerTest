@@ -142,6 +142,7 @@ void AGrabber::Get_All_Names()
 		}
 	}
 
+	//Storing Viewport Actors in text file
 	FString Dir(FPaths::ProjectContentDir() + "Viewport_Actors_" + FString::FromInt(spheres_documented) + ".txt");
 	FFileHelper::SaveStringArrayToFile(Viewport_Actors, *Dir);
 }
@@ -149,6 +150,7 @@ void AGrabber::Get_All_Names()
 //--------------------Look Math for Looking at Sphere--------------------
 FQuat AGrabber::Look(FVector dest_point, FVector curr_loc)
 {
+	//Rotation Math
 	FVector v_to_normalize = dest_point - curr_loc;
 	FVector cross_prod;
 	float dot;
